@@ -32,7 +32,7 @@ public class DomainValidatorUtil {
     public static boolean isValidDomain(String domainName) {
         if (domainName == null || domainName.isBlank()) return false;
 
-        domainName = domainName.replaceAll("\\s", "").trim();
+        domainName = DomainSanitizer.sanitize(domainName);
         DomainValidator validator = DomainValidator.getInstance();
 
         return validator.isValid(domainName);
