@@ -114,7 +114,7 @@ Open `settings.json` and add the following configuration:
 
 Save the file and restart the application. Open Copilot and set mode to `Agent` to use the WHOIS MCP server.
 
-## Architecture
+## Project Structure
 
 The project is structured around the following key components:
 
@@ -161,4 +161,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Author
 
 Jordi Ayala - [asjordi.dev](https://asjordi.dev)
+
 [Root Zone Database](https://www.iana.org/domains/root/db)
