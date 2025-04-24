@@ -161,4 +161,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Author
 
 Jordi Ayala - [asjordi.dev](https://asjordi.dev)
-`
+[Root Zone Database](https://www.iana.org/domains/root/db)
