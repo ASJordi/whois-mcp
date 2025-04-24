@@ -8,9 +8,11 @@ WHOIS MCP is a Java application that provides WHOIS lookup functionality through
 
 ## Demo
 
-![VSCode Demo](media/demo1.mp4)
-![VSCode Demo](media/demo2.mp4)
-![MCP Inspector](media/demo-inspector.mp4)
+https://github.com/user-attachments/assets/037a30de-c330-4dd4-93c2-2add936b9caf
+
+https://github.com/user-attachments/assets/2a91045a-b922-4832-9500-dc9eacb54ee0
+
+https://github.com/user-attachments/assets/befbb1e0-137c-4534-b7f7-433305a41755
 
 ## Features
 
