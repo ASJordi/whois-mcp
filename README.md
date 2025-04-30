@@ -125,6 +125,7 @@ The project is structured around the following key components:
 - **WhoisCache**: Caches WHOIS server information based on domain extensions.
 - **DomainValidatorUtil**: Validates domain names using the Apache Commons Validator.
 - **DomainSanitizer**: Sanitizes domain names by removing unnecessary characters and ensuring proper formatting.
+- **McpException**: Custom exception class for handling errors specific to the WHOIS MCP server.
 
 ### Flow
 
