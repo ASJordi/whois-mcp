@@ -1,6 +1,7 @@
 package dev.asjordi;
 
 import org.apache.commons.net.whois.WhoisClient;
+import dev.asjordi.exceptions.WhoisQueryException;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Optional;
@@ -39,9 +40,9 @@ public class WhoisService {
      *
      * @param domain The domain to query.
      * @return An Optional containing the raw WHOIS response, or empty if the domain is invalid or the query fails.
-     * @throws IOException If an error occurs during the query.
+     * @throws WhoisQueryException If an error occurs during the query.
      */
-    public Optional<String> performWhoisQuery(String domain) throws IOException {
+    public Optional<String> performWhoisQuery(String domain) throws WhoisQueryException {
         if (domain == null || domain.isBlank() || !DomainValidatorUtil.isValidDomain(domain)) return Optional.empty();
 
         domain = DomainSanitizer.sanitize(domain);
@@ -58,13 +59,15 @@ public class WhoisService {
             String result = whoisClient.query(domain);
             return Optional.ofNullable(result);
         } catch (UnknownHostException e) {
-            System.err.println("Error: Unable to resolve host '" + whoisServer + "'. Please check your DNS settings or try again later.");
-            throw new RuntimeException("Host resolution failed for '" + whoisServer + "'", e);
+            throw new WhoisQueryException("Host resolution failed for '" + whoisServer + "'", e);
         } catch (IOException e) {
-            System.err.println("Error: Unable to connect to the WHOIS server. Please check your network connection.");
-            throw new RuntimeException("Connection failed to WHOIS server", e);
+            throw new WhoisQueryException("Connection failed to WHOIS server", e);
         } finally {
-            whoisClient.disconnect();
+            try {
+                whoisClient.disconnect();
+            } catch (IOException e) {
+                throw new WhoisQueryException("Failed to disconnect from WHOIS server", e);
+            }
         }
     }
 }

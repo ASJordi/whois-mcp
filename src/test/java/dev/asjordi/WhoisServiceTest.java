@@ -140,7 +140,7 @@ class WhoisServiceTest {
         }
 
         @Override
-        public Optional<String> performWhoisQuery(String domain) throws IOException {
+        public Optional<String> performWhoisQuery(String domain) {
             if (domain == null || domain.isBlank() || !DomainValidatorUtil.isValidDomain(domain)) return Optional.empty();
 
             domain = DomainSanitizer.sanitize(domain);

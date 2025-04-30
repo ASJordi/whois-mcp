@@ -1,5 +1,7 @@
 package dev.asjordi;
 
+import dev.asjordi.exceptions.DomainValidationException;
+
 /**
  * Utility class for sanitizing domain names.
  * <p>
@@ -18,9 +20,11 @@ public class DomainSanitizer {
      * @return A sanitized domain name.
      */
     public static String sanitize(String domain) {
-        if (domain == null || domain.isBlank()) throw new IllegalArgumentException("Domain cannot be null or empty");
+        if (domain == null || domain.isBlank()) throw new DomainValidationException("Domain cannot be null or empty");
+
         domain = domain.replaceAll("\\s", "").trim();
         if (domain.startsWith("www.")) domain = domain.substring(4);
+
         return domain.toLowerCase();
     }
 }

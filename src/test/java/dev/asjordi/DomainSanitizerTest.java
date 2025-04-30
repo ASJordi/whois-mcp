@@ -1,5 +1,6 @@
 package dev.asjordi;
 
+import dev.asjordi.exceptions.DomainValidationException;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,17 +29,17 @@ class DomainSanitizerTest {
 
     @Test
     void testSanitizeHandlesNullInput() {
-        assertThrows(IllegalArgumentException.class, () -> DomainSanitizer.sanitize(null));
+        assertThrows(DomainValidationException.class, () -> DomainSanitizer.sanitize(null));
     }
 
     @Test
     void testSanitizeHandlesEmptyInput() {
-        assertThrows(IllegalArgumentException.class, () -> DomainSanitizer.sanitize(""));
+        assertThrows(DomainValidationException.class, () -> DomainSanitizer.sanitize(""));
     }
 
     @Test
     void testSanitizeHandlesOnlyWhitespaceInput() {
-        assertThrows(IllegalArgumentException.class, () -> DomainSanitizer.sanitize("   "));
+        assertThrows(DomainValidationException.class, () -> DomainSanitizer.sanitize("   "));
     }
 
     @Test

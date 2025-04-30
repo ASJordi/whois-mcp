@@ -1,6 +1,8 @@
 package dev.asjordi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.asjordi.exceptions.DomainValidationException;
+import dev.asjordi.exceptions.WhoisQueryException;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -9,7 +11,6 @@ import io.modelcontextprotocol.spec.McpSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -97,15 +98,11 @@ public class Main {
 
                     String domain = (String) args.get("domain");
 
-                    if (!DomainValidatorUtil.isValidDomain(domain)) {
-                        log.warn("Invalid domain: {}", domain);
-                        return new McpSchema.CallToolResult(
-                                List.of(new McpSchema.TextContent("Error: Invalid domain: " + domain)),
-                                true
-                        );
-                    }
-
                     try {
+                        if (!DomainValidatorUtil.isValidDomain(domain)) {
+                            throw new DomainValidationException("Invalid domain: " + domain);
+                        }
+
                         var info = whoisService.performWhoisQuery(domain);
 
                         if (info.isPresent()) {
@@ -121,10 +118,10 @@ public class Main {
                                     false
                             );
                         }
-                    } catch (IOException e) {
-                        log.error("Error retrieving WHOIS information for domain: {}", domain, e);
+                    } catch (DomainValidationException | WhoisQueryException e) {
+                        log.error("Error processing domain: {}", domain, e);
                         return new McpSchema.CallToolResult(
-                                List.of(new McpSchema.TextContent("Error retrieving WHOIS information: " + e.getMessage())),
+                                List.of(new McpSchema.TextContent("Error: " + e.getMessage())),
                                 true
                         );
                     }
