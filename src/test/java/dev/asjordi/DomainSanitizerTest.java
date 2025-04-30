@@ -48,4 +48,32 @@ class DomainSanitizerTest {
         String expected = "example.com";
         assertEquals(expected, DomainSanitizer.sanitize(input));
     }
+
+    @Test
+    void testSanitizeRemovesHttpPrefix() {
+        String input = "http://example.com";
+        String expected = "example.com";
+        assertEquals(expected, DomainSanitizer.sanitize(input));
+    }
+
+    @Test
+    void testSanitizeRemovesHttpsPrefix() {
+        String input = "https://example.com";
+        String expected = "example.com";
+        assertEquals(expected, DomainSanitizer.sanitize(input));
+    }
+
+    @Test
+    void testSanitizeRemovesHttpsAndWWW() {
+        String input = "https://www.example.com";
+        String expected = "example.com";
+        assertEquals(expected, DomainSanitizer.sanitize(input));
+    }
+
+    @Test
+    void testSanitizeRemovesHttpAndWWW() {
+        String input = "http://www.example.com";
+        String expected = "example.com";
+        assertEquals(expected, DomainSanitizer.sanitize(input));
+    }
 }
