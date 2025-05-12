@@ -1,5 +1,8 @@
 package dev.asjordi;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -7,68 +10,68 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-/**
- * Provides a caching mechanism for WHOIS servers.
- * <p>
- * This class initializes a cache of WHOIS servers from a properties file or defaults
- * to predefined servers if the file is unavailable. The cache allows querying WHOIS
- * servers based on domain extensions.
- * </p>
- */
 public class WhoisCache {
 
+    private static final Logger logger = LoggerFactory.getLogger(WhoisCache.class);
     private final Map<String, String> cache;
 
-    /**
-     * Creates a new instance of {@code WhoisCache} and initializes the cache.
-     */
     public WhoisCache() {
         cache = new HashMap<>();
         initializeCache();
     }
 
-    /**
-     * Loads WHOIS servers into the cache.
-     * 
-     * This method attempts to load WHOIS servers from a properties file. If the file
-     * is unavailable or an error occurs, it falls back to loading default WHOIS servers.
-     */
     private void initializeCache() {
+        logger.atInfo().log("Initializing WHOIS cache...");
         Properties properties = new Properties();
 
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("whois-servers.properties")) {
             if (input != null) {
+                logger.atDebug().log("Loading WHOIS servers from properties file...");
                 properties.load(input);
 
                 for (String key : properties.stringPropertyNames()) {
                     cache.put(key, properties.getProperty(key));
+                    logger.atDebug().log("Loaded WHOIS server: {} -> {}", key, properties.getProperty(key));
                 }
-            } else loadDefaultServers();
+            } else {
+                logger.atWarn().log("WHOIS properties file not found. Loading default servers...");
+                loadDefaultServers();
+            }
         } catch (IOException e) {
+            logger.atError()
+                    .setMessage("Error loading WHOIS properties file")
+                    .setCause(e)
+                    .log();
+            logger.atInfo().log("Falling back to default WHOIS servers...");
             loadDefaultServers();
         }
     }
 
-    /**
-     * Loads a predefined set of default WHOIS servers into the cache.
-     */
     private void loadDefaultServers() {
+        logger.atInfo().log("Loading default WHOIS servers...");
         cache.put(".com", "whois.verisign-grs.com");
         cache.put(".net", "whois.verisign-grs.com");
         cache.put(".org", "whois.pir.org");
         cache.put(".io", "whois.nic.io");
         cache.put(".co", "whois.nic.co");
+        logger.atDebug().log("Default WHOIS servers loaded.");
     }
 
-    /**
-     * Retrieves the WHOIS server for the specified domain extension.
-     * 
-     * @param domain the domain extension (e.g., ".com", ".net"). Must start with a dot.
-     * @return an {@code Optional} containing the WHOIS server if found, or an empty {@code Optional} if not.
-     */
     public Optional<String> getWhoisServer(String domain) {
-        if (domain == null || domain.isBlank() || !domain.startsWith(".")) return Optional.empty();
-        return Optional.ofNullable(cache.get(domain.toLowerCase()));
-    }
+        logger.atDebug().log("Retrieving WHOIS server for domain: {}", domain);
 
+        if (domain == null || domain.isBlank() || !domain.startsWith(".")) {
+            logger.atWarn().log("Invalid domain extension: {}", domain);
+            return Optional.empty();
+        }
+
+        Optional<String> server = Optional.ofNullable(cache.get(domain.toLowerCase()));
+        if (server.isPresent()) {
+            logger.atInfo().log("Found WHOIS server for {}: {}", domain, server.get());
+        } else {
+            logger.atWarn().log("No WHOIS server found for domain: {}", domain);
+        }
+
+        return server;
+    }
 }

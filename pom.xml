@@ -16,6 +16,23 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <licenses>
+    <license>
+        <name>MIT License</name>
+        <url>https://opensource.org/licenses/MIT</url>
+        <distribution>repo</distribution>
+        <comments>See LICENSE file in the root of the project</comments>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>asjordi</id>
+      <name>Jordi Ayala</name>
+      <email>me@asjordi.dev</email>
+    </developer>
+  </developers>
+
   <dependencies>
     <dependency>
       <groupId>io.modelcontextprotocol.sdk</groupId>
@@ -24,10 +41,23 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+      <version>2.0.17</version>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>2.24.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.24.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
+      <version>2.24.3</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>commons-net</groupId>

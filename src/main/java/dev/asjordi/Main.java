@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class Main {
 
-    private static final Logger log = LoggerFactory.getLogger(Main.class);
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
     private static final WhoisService whoisService = new WhoisService();
 
     /**
@@ -55,7 +55,7 @@ public class Main {
                 .tools(syncToolSpecification)
                 .build();
 
-        log.info("Starting WHOIS server...");
+        logger.atInfo().log("Starting WHOIS server...");
     }
 
     /**
@@ -106,20 +106,24 @@ public class Main {
                         var info = whoisService.performWhoisQuery(domain);
 
                         if (info.isPresent()) {
-                            log.info("WHOIS information retrieved for domain: {}", domain);
+                            logger.atInfo().log("WHOIS information retrieved for domain: {}", domain);
                             List<McpSchema.Content> contents = new ArrayList<>();
                             contents.add(new McpSchema.TextContent(info.get()));
 
                             return new McpSchema.CallToolResult(contents, false);
                         } else {
-                            log.warn("No WHOIS information found for domain: {}", domain);
+                            logger.atInfo().log("No WHOIS information available for domain: {}", domain);
                             return new McpSchema.CallToolResult(
                                     List.of(new McpSchema.TextContent("No WHOIS information available for " + domain)),
                                     false
                             );
                         }
                     } catch (DomainValidationException | WhoisQueryException e) {
-                        log.error("Error processing domain: {}", domain, e);
+                        logger.atError()
+                                .setMessage("Error processing domain: {}")
+                                .addArgument(domain)
+                                .setCause(e)
+                                .log();
                         return new McpSchema.CallToolResult(
                                 List.of(new McpSchema.TextContent("Error: " + e.getMessage())),
                                 true

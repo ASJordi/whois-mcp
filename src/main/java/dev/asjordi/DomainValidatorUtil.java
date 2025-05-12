@@ -1,41 +1,32 @@
 package dev.asjordi;
 
 import org.apache.commons.validator.routines.DomainValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * Utility class for validating domain names.
- * <p>
- * This class provides a method to validate domain names using the Apache Commons Validator library.
- * It ensures that the domain name is properly formatted and adheres to standard domain name rules.
- * </p>
- * <p>
- * Example usage:
- * <pre>
- *     boolean isValid = DomainValidatorUtil.isValidDomain("example.com");
- *     System.out.println("Is valid: " + isValid); // Output: true
- * </pre>
- * </p>
- */
 public class DomainValidatorUtil {
 
-    /**
-     * A private constructor to prevent instantiation.
-     */
+    private static final Logger logger = LoggerFactory.getLogger(DomainValidatorUtil.class);
+
     private DomainValidatorUtil() { }
 
-    /**
-     * Validates if the given domain name is valid.
-     *
-     * @param domainName the domain name to validate
-     * @return true if the domain name is valid, false otherwise
-     */
     public static boolean isValidDomain(String domainName) {
-        if (domainName == null || domainName.isBlank()) return false;
+        logger.atDebug().log("Validating domain: {}", domainName);
+
+        if (domainName == null || domainName.isBlank()) {
+            logger.atWarn().log("Domain is null or blank");
+            return false;
+        }
 
         domainName = DomainSanitizer.sanitize(domainName);
+        logger.atDebug().log("Sanitized domain: {}", domainName);
+
         DomainValidator validator = DomainValidator.getInstance();
+        boolean isValid = validator.isValid(domainName);
 
-        return validator.isValid(domainName);
+        if (isValid) logger.atInfo().log("Domain is valid: {}", domainName);
+        else logger.atWarn().log("Domain is invalid: {}", domainName);
+
+        return isValid;
     }
-
 }

@@ -6,6 +6,21 @@
   <name>whois-mcp</name>
   <version>1.0-SNAPSHOT</version>
   <url>https://asjordi.dev</url>
+  <developers>
+    <developer>
+      <id>asjordi</id>
+      <name>Jordi Ayala</name>
+      <email>me@asjordi.dev</email>
+    </developer>
+  </developers>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
+      <comments>See LICENSE file in the root of the project</comments>
+    </license>
+  </licenses>
   <build>
     <plugins>
       <plugin>
