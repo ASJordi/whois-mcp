@@ -3,6 +3,8 @@ package dev.asjordi;
 import org.apache.commons.net.whois.WhoisClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -12,12 +14,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class WhoisServiceTest {
 
+    private static final Logger logger = LoggerFactory.getLogger(WhoisServiceTest.class);
+
     private WhoisService whoisService;
     private TestWhoisCache mockWhoisCache;
     private TestWhoisClient mockWhoisClient;
 
     @BeforeEach
     void setUp() {
+        logger.atTrace().log("Setting up mock dependencies for WhoisServiceTest");
         mockWhoisCache = new TestWhoisCache();
         mockWhoisClient = new TestWhoisClient();
         whoisService = new TestWhoisService(mockWhoisCache, mockWhoisClient);
@@ -25,16 +30,16 @@ class WhoisServiceTest {
 
     @Test
     void testValidDomainWithSuccessfulQuery() throws IOException {
-        // Arrange
+        logger.atTrace().log("Testing valid domain with successful query");
         String domain = "example.com";
         String expectedResponse = "Domain Name: example.com\nRegistry Domain ID: 2336799_DOMAIN_COM-VRSN";
         mockWhoisCache.setServerForTld(".com", "whois.verisign-grs.com");
         mockWhoisClient.setResponse(expectedResponse);
 
-        // Act
+        logger.atTrace().log("Performing WHOIS query for domain: {}", domain);
         Optional<String> result = whoisService.performWhoisQuery(domain);
 
-        // Assert
+        logger.atTrace().log("Asserting results for domain: {}", domain);
         assertTrue(result.isPresent());
         assertEquals(expectedResponse, result.get());
         assertEquals("whois.verisign-grs.com", mockWhoisClient.getLastConnectedServer());
@@ -43,35 +48,36 @@ class WhoisServiceTest {
 
     @Test
     void testInvalidDomainReturnsEmptyOptional() throws IOException {
-        // Test null domain
+        logger.atTrace().log("Testing invalid domains returning empty optional");
+
+        logger.atTrace().log("Testing null domain");
         Optional<String> nullResult = whoisService.performWhoisQuery(null);
         assertTrue(nullResult.isEmpty());
 
-        // Test empty domain
+        logger.atTrace().log("Testing empty domain");
         Optional<String> emptyResult = whoisService.performWhoisQuery("");
         assertTrue(emptyResult.isEmpty());
 
-        // Test blank domain
+        logger.atTrace().log("Testing blank domain");
         Optional<String> blankResult = whoisService.performWhoisQuery("   ");
         assertTrue(blankResult.isEmpty());
 
-        // Test invalid domain format
+        logger.atTrace().log("Testing invalid domain format");
         Optional<String> invalidResult = whoisService.performWhoisQuery("invalid-domain");
         assertTrue(invalidResult.isEmpty());
     }
 
     @Test
     void testDomainWithUnknownTldUsesIanaServer() throws IOException {
-        // Arrange
-        String domain = "example.com";  // Using a valid domain format but with a TLD not in our mock cache
+        logger.atTrace().log("Testing domain with unknown TLD using IANA server");
+        String domain = "example.com";
         String expectedResponse = "Domain not found";
         mockWhoisClient.setResponse(expectedResponse);
-        // Don't set any server for .com in the cache, so it will use the fallback
 
-        // Act
+        logger.atTrace().log("Performing WHOIS query for domain: {}", domain);
         Optional<String> result = whoisService.performWhoisQuery(domain);
 
-        // Assert
+        logger.atTrace().log("Asserting results for domain: {}", domain);
         assertTrue(result.isPresent());
         assertEquals(expectedResponse, result.get());
         assertEquals("whois.iana.org", mockWhoisClient.getLastConnectedServer());
@@ -80,51 +86,52 @@ class WhoisServiceTest {
 
     @Test
     void testUnknownHostExceptionThrowsRuntimeException() throws IOException {
-        // Arrange
+        logger.atTrace().log("Testing UnknownHostException handling");
         String domain = "example.com";
         mockWhoisCache.setServerForTld(".com", "whois.verisign-grs.com");
         mockWhoisClient.setThrowUnknownHostException(true);
 
-        // Act & Assert
+        logger.atTrace().log("Performing WHOIS query for domain: {}", domain);
         Exception exception = assertThrows(RuntimeException.class, () -> {
             whoisService.performWhoisQuery(domain);
         });
 
+        logger.atTrace().log("Asserting exception for UnknownHostException");
         assertTrue(exception.getMessage().contains("Host resolution failed"));
         assertTrue(exception.getCause() instanceof UnknownHostException);
     }
 
     @Test
     void testIOExceptionThrowsRuntimeException() throws IOException {
-        // Arrange
+        logger.atTrace().log("Testing IOException handling");
         String domain = "example.com";
         mockWhoisCache.setServerForTld(".com", "whois.verisign-grs.com");
         mockWhoisClient.setThrowIOException(true);
 
-        // Act & Assert
+        logger.atTrace().log("Performing WHOIS query for domain: {}", domain);
         Exception exception = assertThrows(RuntimeException.class, () -> {
             whoisService.performWhoisQuery(domain);
         });
 
+        logger.atTrace().log("Asserting exception for IOException");
         assertTrue(exception.getMessage().contains("Connection failed"));
         assertTrue(exception.getCause() instanceof IOException);
     }
 
     @Test
     void testDomainSanitization() throws IOException {
-        // Arrange
+        logger.atTrace().log("Testing domain sanitization");
         String domain = "  WWW.EXAMPLE.COM  ";
         String expectedResponse = "Domain Name: example.com";
         mockWhoisCache.setServerForTld(".com", "whois.verisign-grs.com");
         mockWhoisClient.setResponse(expectedResponse);
 
-        // Act
+        logger.atTrace().log("Performing WHOIS query for domain: {}", domain);
         Optional<String> result = whoisService.performWhoisQuery(domain);
 
-        // Assert
+        logger.atTrace().log("Asserting results for sanitized domain: {}", domain);
         assertTrue(result.isPresent());
         assertEquals(expectedResponse, result.get());
-        // The sanitized domain should be passed to the WhoisClient
         String sanitizedDomain = DomainSanitizer.sanitize(domain);
         assertEquals(sanitizedDomain, mockWhoisClient.getLastQuery());
     }
@@ -234,3 +241,4 @@ class WhoisServiceTest {
         }
     }
 }
+
